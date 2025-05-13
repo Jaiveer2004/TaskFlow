@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow - Add Task</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="/">TaskFlow</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/add-task">Add Task</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="mb-4">Add New Task</h2>
+    <form action="/add-task" method="POST" class="w-50 mx-auto" id="addTaskForm" novalidate>
+      <div class="mb-3">
+        <label for="title" class="form-label"><i class="fas fa-heading me-2"></i>Title:</label>
+        <input type="text" id="title" name="title" class="form-control" required aria-required="true">
+        <% errors.filter(e => e.path === 'title').forEach(e => { %>
+          <div class="text-danger small"><%= e.msg %></div>
+        <% }) %>
+      </div>
+      <div class="mb-3">
+        <label for="description" class="form-label"><i class="fas fa-align-left me-2"></i>Description:</label>
+        <textarea id="description" name="description" class="form-control" rows="3" required aria-required="true"></textarea>
+        <% errors.filter(e => e.path === 'description').forEach(e => { %>
+          <div class="text-danger small"><%= e.msg %></div>
+        <% }) %>
+      </div>
+      <div class="mb-3">
+        <label for="category" class="form-label"><i class="fas fa-tag me-2"></i>Category:</label>
+        <select id="category" name="category" class="form-select" required aria-required="true">
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+        <% errors.filter(e => e.path === 'category').forEach(e => { %>
+          <div class="text-danger small"><%= e.msg %></div>
+        <% }) %>
+      </div>
+      <div class="mb-3">
+        <label for="status" class="form-label"><i class="fas fa-check-circle me-2"></i>Status:</label>
+        <select id="status" name="status" class="form-select" required aria-required="true">
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <% errors.filter(e => e.path === 'status').forEach(e => { %>
+          <div class="text-danger small"><%= e.msg %></div>
+        <% }) %>
+      </div>
+      <div class="mb-3">
+        <label for="deadline" class="form-label"><i class="fas fa-calendar-alt me-2"></i>Deadline:</label>
+        <input type="date" id="deadline" name="deadline" class="form-control" required aria-required="true">
+        <% errors.filter(e => e.path === 'deadline').forEach(e => { %>
+          <div class="text-danger small"><%= e.msg %></div>
+        <% }) %>
+      </div>
+      <div class="mb-3">
+        <label for="priority" class="form-label"><i class="fas fa-flag me-2"></i>Priority:</label>
+        <select id="priority" name="priority" class="form-select" required aria-required="true">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <% errors.filter(e => e.path === 'priority').forEach(e => { %>
+          <div class="text-danger small"><%= e.msg %></div>
+        <% }) %>
+      </div>
+      <input type="hidden" id="latitude" name="latitude">
+      <input type="hidden" id="longitude" name="longitude">
+      <div id="locationError" class="alert alert-danger py-1 text-center d-none"></div>
+      <% errors.filter(e => e.path === 'latitude' || e.path === 'longitude').forEach(e => { %>
+        <div class="alert alert-danger py-1 text-center"><%= e.msg %></div>
+      <% }) %>
+      <button type="submit" class="btn btn-primary w-100" id="submitButton" disabled>Adding Task...</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('addTaskForm');
+      const submitButton = document.getElementById('submitButton');
+      const locationError = document.getElementById('locationError');
+      const latitudeInput = document.getElementById('latitude');
+      const longitudeInput = document.getElementById('longitude');
+
+      function enableFormSubmission() {
+        submitButton.textContent = 'Add Task';
+        submitButton.disabled = false;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            latitudeInput.value = position.coords.latitude;
+            longitudeInput.value = position.coords.longitude;
+            enableFormSubmission();
+          },
+          (error) => {
+            locationError.textContent = `Unable to retrieve location: ${error.message}`;
+            locationError.classList.remove('d-none');
+            latitudeInput.value = '';
+            longitudeInput.value = '';
+            enableFormSubmission();
+          },
+          { timeout: 10000, enableHighAccuracy: true }
+        );
+      } else {
+        locationError.textContent = 'Geolocation is not supported by your browser.';
+        locationError.classList.remove('d-none');
+        latitudeInput.value = '';
+        longitudeInput.value = '';
+        enableFormSubmission();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+/* Global Styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #1a2634 0%, #2e3b4e 100%);
+  color: #e0e0e0;
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #1a2634;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #26a69a !important;
+}
+.navbar-brand:hover {
+  color: #4db6ac !important;
+}
+.nav-link {
+  color: #e0e0e0 !important;
+  font-weight: 500;
+}
+.nav-link:hover {
+  color: #26a69a !important;
+}
+
+/* Container */
+.container {
+  padding-top: 80px; /* Account for fixed navbar */
+  padding-bottom: 20px;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: #ffffff;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Task Cards */
+.task-card {
+  background-color: #2e3b4e;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+  margin-bottom: 20px;
+}
+.task-card:hover {
+  transform: translateY(-5px);
+}
+.priority-high { border-left: 5px solid #dc3545; }
+.priority-medium { border-left: 5px solid #ffc107; }
+.priority-low { border-left: 5px solid #26a69a; }
+.card-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+.card-text {
+  color: #e0e0e0;
+}
+.text-muted {
+  color: #b0bec5 !important;
+}
+.text-muted i {
+  color: #26a69a;
+}
+
+/* Add Task Card */
+.add-task-card {
+  background-color: #2e3b4e;
+  border: 2px dashed #26a69a;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.add-task-card:hover {
+  background-color: #374659;
+}
+.add-task-icon {
+  font-size: 3rem;
+  color: #26a69a;
+}
+
+/* Forms */
+.form-control, .form-select {
+  background-color: #374659;
+  border: 1px solid #26a69a;
+  color: #e0e0e0;
+}
+.form-control:focus, .form-select:focus {
+  background-color: #374659;
+  border-color: #4db6ac;
+  box-shadow: 0 0 5px rgba(38, 166, 154, 0.5);
+  color: #e0e0e0;
+}
+.form-label {
+  color: #ffffff;
+  font-weight: 500;
+}
+.form-label i {
+  color: #26a69a;
+}
+.btn-primary {
+  background-color: #26a69a;
+  border: none;
+}
+.btn-primary:hover {
+  background-color: #4db6ac;
+}
+.btn-secondary {
+  background-color: #374659;
+  border: none;
+}
+.btn-secondary:hover {
+  background-color: #4e5b6e;
+}
+.alert-danger {
+  background-color: #dc3545;
+  color: #ffffff;
+  border: none;
+}
+
+/* Auth Box (Login/Signup) */
+.auth-box {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  background-color: #2e3b4e;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Error Pages (404, 500) */
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.error-page h1 {
+  font-size: 6rem;
+  font-weight: 700;
+}
+.error-page p {
+  font-size: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding-top: 70px;
+  }
+  .auth-box {
+    margin: 80px 15px;
+    padding: 20px;
+  }
+  .task-card, .add-task-card {
+    margin-bottom: 15px;
+  }
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
+  .nav-link {
+    font-size: 0.9rem;
+  }
+}
