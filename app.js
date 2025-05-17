@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const { MongoClient } = require('mongodb');
-const path = require('path');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -24,7 +23,7 @@ if (!process.env.SESSION_SECRET) {
 
 // MongoDB connection
 const client = new MongoClient(process.env.MONGODB_URI, { 
-  useUnifiedTopology: true, 
+  // useUnifiedTopology: true, 
   maxPoolSize: 10, 
   minPoolSize: 2, 
   connectTimeoutMS: 10000, 
@@ -39,28 +38,6 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
-// Cache settings (in milliseconds)
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
-
-// Rate limiting for login and signup
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
-  message: 'Too many attempts, please try again after 15 minutes'
-});
-
-// Middlewares
-app.use(compression());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public', {
-  maxAge: '1d',
-  etag: true
-}));
-app.set('view engine', 'ejs');
-
-if (process.env.NODE_ENV === 'production') {
-  app.set('view cache', true);
-}
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -73,6 +50,30 @@ app.use(session({
     maxAge: 2 * 60 * 60 * 1000 // 2 hours
   }
 }));
+
+// Cache settings (in milliseconds)
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+// Rate limiting for login and signup
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: 'Too many attempts, please try again after 15 minutes'
+});
+
+// Middlewares
+app.use(compression()); // uses gzip
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public', {
+  maxAge: '1d',
+  etag: true
+}));
+app.set('view engine', 'ejs');
+
+if (process.env.NODE_ENV === 'production') {
+  app.set('view cache', true);
+}
+
 
 // Set up MongoDB database, collections, and indexes
 async function setupMongo() {
@@ -126,7 +127,7 @@ async function getUsers(username = null) {
     } else {
       users = await db.collection('users').find().toArray();
     }
-    cache.put(cacheKey, users, CACHE_DURATION);
+    cache.put(cacheKey, users, CACHE_DURATION); // CACHE_DURATION : 10 minutes
     return users;
   } catch (err) {
     return [];
@@ -136,7 +137,7 @@ async function getUsers(username = null) {
 async function saveUser(user) {
   try {
     await db.collection('users').insertOne(user);
-    cache.del('users');
+    cache.del('users'); // Purpose: Next time we load cache, we get the new list with new users included.
     cache.del(`users_${user.username}`);
   } catch (err) {
     throw err;
@@ -440,7 +441,9 @@ app.use((err, req, res, next) => {
 
 // Start server after MongoDB setup
 setupMongo().then(() => {
-  app.listen(PORT, () => {});
+  app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+  });
 }).catch(err => {
   process.exit(1);
 });
